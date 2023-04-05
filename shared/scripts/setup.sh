@@ -9,22 +9,22 @@ cd /ops
 
 CONFIGDIR=/ops/shared/config
 
-CONSULVERSION=1.11.4
+CONSULVERSION=1.15.2
 CONSULDOWNLOAD=https://releases.hashicorp.com/consul/${CONSULVERSION}/consul_${CONSULVERSION}_linux_amd64.zip
 CONSULCONFIGDIR=/etc/consul.d
 CONSULDIR=/opt/consul
 
-VAULTVERSION=1.5.3
+VAULTVERSION=1.13.1
 VAULTDOWNLOAD=https://releases.hashicorp.com/vault/${VAULTVERSION}/vault_${VAULTVERSION}_linux_amd64.zip
 VAULTCONFIGDIR=/etc/vault.d
 VAULTDIR=/opt/vault
 
-NOMADVERSION=1.3.3
+NOMADVERSION=1.5.2
 NOMADDOWNLOAD=https://releases.hashicorp.com/nomad/${NOMADVERSION}/nomad_${NOMADVERSION}_linux_amd64.zip
 NOMADCONFIGDIR=/etc/nomad.d
 NOMADDIR=/opt/nomad
 
-CONSULTEMPLATEVERSION=0.25.1
+CONSULTEMPLATEVERSION=0.30.0
 CONSULTEMPLATEDOWNLOAD=https://releases.hashicorp.com/consul-template/${CONSULTEMPLATEVERSION}/consul-template_${CONSULTEMPLATEVERSION}_linux_amd64.zip
 CONSULTEMPLATECONFIGDIR=/etc/consul-template.d
 CONSULTEMPLATEDIR=/opt/consul-template
@@ -36,7 +36,7 @@ case $CLOUD_ENV in
     ;;
 
   gce)
-    sudo apt-get update && sudo apt-get install -y software-properties-common
+    sudo apt-get update && sudo apt-get upgrade && sudo apt-get install -y software-properties-common
     ;;
 
   azure)
@@ -119,15 +119,13 @@ sudo chmod 755 $CONSULTEMPLATEDIR
 
 
 # Docker
-distro=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
-sudo apt-get install -y apt-transport-https ca-certificates gnupg2 
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/${distro} $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get install -y docker-ce
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce
 
 # Java
-sudo add-apt-repository -y ppa:openjdk-r/ppa
-sudo apt-get update 
-sudo apt-get install -y openjdk-8-jdk
+sudo apt-get update
+sudo apt-get install -y openjdk-17-jdk
 JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
