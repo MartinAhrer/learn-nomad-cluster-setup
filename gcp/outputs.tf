@@ -6,6 +6,14 @@ output "consul_bootstrap_token_secret" {
   value = var.nomad_consul_token_secret
 }
 
+output "instance_client_ip_addresses" {
+    value=google_compute_instance.client[*].network_interface.0.access_config.0.nat_ip
+}
+
+output "instance_server_ip_addresses" {
+    value=google_compute_instance.server[*].network_interface.0.access_config.0.nat_ip
+}
+
 output "IP_Addresses" {
   value = <<CONFIGURATION
 
